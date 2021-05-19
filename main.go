@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
+	"net/http"
 )
 
 /**
@@ -31,6 +33,64 @@ import (
 *
  */
 
+// call api
+// parse response to array
+// print valid line of json
+// write tests
+// zip it
+// be done
+// https://gist.github.com/jeffling/2dd661ff8398726883cff09839dc316c
+
 func main() {
-	log.Print("executed")
+	debts := getDebt("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts")
+	paymentPlans := getPaymentPlans("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans")
+	payments := getPayments("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments")
+	log.Printf("%v %v %v", debts, paymentPlans, payments)
+}
+
+func getDebt(url string) []Debt {
+	res, _ := http.Get(url)
+	defer res.Body.Close()
+	decoder := json.NewDecoder(res.Body)
+	var data []Debt
+	decoder.Decode(&data)
+	return data
+}
+
+func getPaymentPlans(url string) []PaymentPlan {
+	res, _ := http.Get(url)
+	defer res.Body.Close()
+	decoder := json.NewDecoder(res.Body)
+	var data []PaymentPlan
+	decoder.Decode(&data)
+	return data
+}
+
+func getPayments(url string) []Payment {
+	res, _ := http.Get(url)
+	defer res.Body.Close()
+	decoder := json.NewDecoder(res.Body)
+	var data []Payment
+	decoder.Decode(&data)
+	return data
+}
+
+type Debt struct {
+	ID     int     `form:"id" json:"id"`
+	Amount float64 `form:"amount" json:"amount"`
+}
+
+type PaymentPlan struct {
+	ID                int     `form:"id" json:"id"`
+	DebtID            int     `form:"debt_id" json:"debt_id"`
+	AmountToPay       float64 `form:"amount_to_pay" json:"amount_to_pay"`
+	Frequency         string  `form:"installment_frequency" json:"installment_frequency"`
+	InstallmentAmount float64 `form:"installment_amount" json:"installment_amount"`
+	StartDate         string  `form:"start_date" json:"start_date"`
+}
+
+type Payment struct {
+	ID     int     `form:"payment_plan_id" json:"payment_plan_id"`
+	Amount float64 `form:"amount" json:"amount"`
+	Date   string  `form:"date" json:"date"`
 }
