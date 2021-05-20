@@ -11,9 +11,9 @@ import (
 // program fetches data from 3 endpoints, parses the data and prints it out in JSON
 func main() {
 	format := "2006-01-02"
-	debts := getDebt("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts")
-	paymentPlans := getPaymentPlans("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans")
-	payments := getPayments("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments")
+	debts, _ := GetDebt("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts")
+	paymentPlans, _ := GetPaymentPlans("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans")
+	payments, _ := GetPayments("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments")
 
 	// init maps of payments and payment plans for quick lookup
 	debtToPlan := make(map[int]int)       // debt_id to index in paymentPlans[]
@@ -72,31 +72,40 @@ func main() {
 	PrintInJson(debts)
 }
 
-func getDebt(url string) []Debt {
-	res, _ := http.Get(url)
+func GetDebt(url string) ([]Debt, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
 	defer res.Body.Close()
 	decoder := json.NewDecoder(res.Body)
 	var data []Debt
 	decoder.Decode(&data)
-	return data
+	return data, nil
 }
 
-func getPaymentPlans(url string) []PaymentPlan {
-	res, _ := http.Get(url)
+func GetPaymentPlans(url string) ([]PaymentPlan, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
 	defer res.Body.Close()
 	decoder := json.NewDecoder(res.Body)
 	var data []PaymentPlan
 	decoder.Decode(&data)
-	return data
+	return data, nil
 }
 
-func getPayments(url string) []Payment {
-	res, _ := http.Get(url)
+func GetPayments(url string) ([]Payment, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
 	defer res.Body.Close()
 	decoder := json.NewDecoder(res.Body)
 	var data []Payment
 	decoder.Decode(&data)
-	return data
+	return data, nil
 }
 
 func PrintInJson(debts []Debt) string {
