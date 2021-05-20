@@ -5,15 +5,19 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // program fetches data from 3 endpoints, parses the data and prints it out in JSON
 func main() {
+	godotenv.Load()
 	format := "2006-01-02"
-	debts, _ := GetDebt("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts")
-	paymentPlans, _ := GetPaymentPlans("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans")
-	payments, _ := GetPayments("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments")
+	debts, _ := GetDebt(os.Getenv("DEBT_URL"))
+	paymentPlans, _ := GetPaymentPlans(os.Getenv("PAYMENT_PLAN_URL"))
+	payments, _ := GetPayments(os.Getenv("PAYMENT_URL"))
 
 	// init maps of payments and payment plans for quick lookup
 	debtToPlan := make(map[int]int)       // debt_id to index in paymentPlans[]
