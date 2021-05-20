@@ -45,7 +45,36 @@ func main() {
 	debts := getDebt("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts")
 	paymentPlans := getPaymentPlans("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans")
 	payments := getPayments("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments")
-	log.Printf("%v %v %v", debts, paymentPlans, payments)
+
+	// init maps of payments and payment plans for quick lookup
+	debtToPlan := make(map[int]int)    // debt_id to index in paymentPlans[]
+	payToPlan := make(map[int]float64) // payment_plan_id to total amount paid
+	for i := 0; i < len(paymentPlans); i += 1 {
+		debtToPlan[paymentPlans[i].DebtID] = i
+	}
+	for i := 0; i < len(payments); i += 1 {
+		payToPlan[payments[i].ID] += payments[i].Amount
+	}
+
+	for i := 0; i < len(debts); i += 1 {
+		// calculate is_in_payment_plan, by seeing that id exists in map and that amount to pay is < debt
+		paymentPlanIndex := debtToPlan[debts[i].ID]
+		pid := paymentPlans[paymentPlanIndex].ID
+		if paymentPlans[paymentPlanIndex].DebtID == debts[i].ID && payToPlan[pid] < debts[i].Amount {
+			debts[i].IsInPaymentPlan = true
+		}
+
+		// calculate remaining_amount, if the debt is associated with a payment plan subtract payments from payment plan total else set to debt amoun
+		if paymentPlans[debtToPlan[debts[i].ID]].DebtID == debts[i].ID {
+			debts[i].RemainingAmount = paymentPlans[debtToPlan[debts[i].ID]].AmountToPay - payToPlan[paymentPlans[debtToPlan[debts[i].ID]].ID]
+		} else {
+			debts[i].RemainingAmount = debts[i].Amount
+		}
+
+		// date, _ := time.Parse("2006-01-02", paymentPlans[pid].StartDate)
+		// log.Printf("%v %v %v  \n", paymentPlanIndex, payToPlan[pid], debts[i])
+		log.Printf("%v", debts[i])
+	}
 }
 
 func getDebt(url string) []Debt {
@@ -76,8 +105,11 @@ func getPayments(url string) []Payment {
 }
 
 type Debt struct {
-	ID     int     `form:"id" json:"id"`
-	Amount float64 `form:"amount" json:"amount"`
+	ID              int     `form:"id" json:"id"`
+	Amount          float64 `form:"amount" json:"amount"`
+	IsInPaymentPlan bool    `form:"is_in_payment_plan" json:"is_in_payment_plan"`
+	RemainingAmount float64 `form:"remaining_amount" json:"remaining_amount"`
+	NextPayment     string  `form:"next_payment_due_date" json:"next_payment_due_date"`
 }
 
 type PaymentPlan struct {
