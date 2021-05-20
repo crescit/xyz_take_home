@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+	"time"
 )
 
 /**
@@ -42,20 +42,28 @@ import (
 // https://gist.github.com/jeffling/2dd661ff8398726883cff09839dc316c
 
 func main() {
+	format := "2006-01-02"
 	debts := getDebt("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts")
 	paymentPlans := getPaymentPlans("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans")
 	payments := getPayments("https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments")
 
 	// init maps of payments and payment plans for quick lookup
-	debtToPlan := make(map[int]int)    // debt_id to index in paymentPlans[]
-	payToPlan := make(map[int]float64) // payment_plan_id to total amount paid
+	debtToPlan := make(map[int]int)       // debt_id to index in paymentPlans[]
+	payToPlan := make(map[int]float64)    // payment_plan_id to total amount paid
+	dateToPlan := make(map[int]time.Time) // payment_plan_id to last date a payment occurede
+
 	for i := 0; i < len(paymentPlans); i += 1 {
 		debtToPlan[paymentPlans[i].DebtID] = i
 	}
 	for i := 0; i < len(payments); i += 1 {
 		payToPlan[payments[i].ID] += payments[i].Amount
+		date, _ := time.Parse(format, payments[i].Date)
+		if dateToPlan[payments[i].ID].Before(date) {
+			dateToPlan[payments[i].ID] = date
+		}
 	}
 
+	// add is_in_payment_plan, remaining_amount, and next_payment_due_date to debt rows
 	for i := 0; i < len(debts); i += 1 {
 		// calculate is_in_payment_plan, by seeing that id exists in map and that amount to pay is < debt
 		paymentPlanIndex := debtToPlan[debts[i].ID]
@@ -64,17 +72,33 @@ func main() {
 			debts[i].IsInPaymentPlan = true
 		}
 
-		// calculate remaining_amount, if the debt is associated with a payment plan subtract payments from payment plan total else set to debt amoun
+		// calculate remaining_amount, if the debt is associated with a payment plan subtract payments from payment plan total else set to debt amount
 		if paymentPlans[debtToPlan[debts[i].ID]].DebtID == debts[i].ID {
 			debts[i].RemainingAmount = paymentPlans[debtToPlan[debts[i].ID]].AmountToPay - payToPlan[paymentPlans[debtToPlan[debts[i].ID]].ID]
 		} else {
 			debts[i].RemainingAmount = debts[i].Amount
 		}
 
-		// date, _ := time.Parse("2006-01-02", paymentPlans[pid].StartDate)
-		// log.Printf("%v %v %v  \n", paymentPlanIndex, payToPlan[pid], debts[i])
-		log.Printf("%v", debts[i])
+		// calculate "next_payment_due_date",
+		if debts[i].RemainingAmount != 0 && debts[i].IsInPaymentPlan {
+			pid := debtToPlan[debts[i].ID]
+			freq := paymentPlans[pid].Frequency
+			start, _ := time.Parse(format, paymentPlans[pid].StartDate)
+			for ok := true; ok; ok = start.Before(dateToPlan[pid]) {
+				var weeksToAdd int
+				if freq == "WEEKLY" {
+					weeksToAdd = 1
+				}
+				if freq == "BI_WEEKLY" {
+					weeksToAdd = 2
+				}
+				start = start.Add(time.Hour * 24 * 7 * time.Duration(weeksToAdd))
+			}
+			debts[i].NextPayment = start.Format(format)
+		}
 	}
+
+	printInJson(debts)
 }
 
 func getDebt(url string) []Debt {
@@ -102,6 +126,10 @@ func getPayments(url string) []Payment {
 	var data []Payment
 	decoder.Decode(&data)
 	return data
+}
+
+func printInJson(debts []Debt) {
+	print(debts)
 }
 
 type Debt struct {
