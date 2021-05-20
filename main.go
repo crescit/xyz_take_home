@@ -18,7 +18,7 @@ func main() {
 	// init maps of payments and payment plans for quick lookup
 	debtToPlan := make(map[int]int)       // debt_id to index in paymentPlans[]
 	payToPlan := make(map[int]float64)    // payment_plan_id to total amount paid
-	dateToPlan := make(map[int]time.Time) // payment_plan_id to last date a payment occurede
+	dateToPlan := make(map[int]time.Time) // payment_plan_id to last date a payment occured
 
 	for i := 0; i < len(paymentPlans); i += 1 {
 		debtToPlan[paymentPlans[i].DebtID] = i
@@ -69,7 +69,7 @@ func main() {
 		}
 	}
 
-	printInJson(debts)
+	PrintInJson(debts)
 }
 
 func getDebt(url string) []Debt {
@@ -99,14 +99,17 @@ func getPayments(url string) []Payment {
 	return data
 }
 
-func printInJson(debts []Debt) {
+func PrintInJson(debts []Debt) string {
+	var res string
 	for i := 0; i < len(debts); i += 1 {
 		debt, err := json.MarshalIndent(debts[i], "", "  ")
 		if err != nil {
 			fmt.Println(err)
 		}
 		fmt.Print(string(debt) + "\n")
+		res += string(debt) + "\n"
 	}
+	return res
 }
 
 type Debt struct {
