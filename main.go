@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -129,7 +130,13 @@ func getPayments(url string) []Payment {
 }
 
 func printInJson(debts []Debt) {
-	print(debts)
+	for i := 0; i < len(debts); i += 1 {
+		debt, err := json.MarshalIndent(debts[i], "", "  ")
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Print(string(debt) + "\n")
+	}
 }
 
 type Debt struct {
