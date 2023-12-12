@@ -1,8 +1,8 @@
 # xyz_take_home
-
+You need three env vars DEBT_URL, PAYMENT_PLAN_URL, PAYMENT_URL. They have been removed from this repo for privacy. 
 To test the application with other urls replace the corresponding values in the .env
   
- ``` DEBT_URL = ""```
+  DEBT_URL = ""
 	returns something like [
   {
     "amount": 123.46,
@@ -27,7 +27,7 @@ To test the application with other urls replace the corresponding values in the 
 ]
 
 
-	```PAYMENT_PLAN_URL = ""```
+	PAYMENT_PLAN_URL = ""
 returns something like 
 [
   {
@@ -63,7 +63,7 @@ returns something like
     "start_date": "2020-08-01"
   }
 ]
-	```PAYMENT_URL = ""```
+	PAYMENT_URL = ""
 
  returns something like 
  [
