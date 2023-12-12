@@ -29,7 +29,7 @@ func TestGetDebt(t *testing.T) {
 		t.Errorf("function failed to fail on empty response with url %q", testUrl)
 	}
 
-	testUrl = "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts"
+	testUrl = ""
 	debt, err := GetDebt(testUrl)
 
 	if len(debt) != 5 {
@@ -44,7 +44,7 @@ func TestGetPaymentPlans(t *testing.T) {
 		t.Errorf("function failed to fail on empty response with url %q", testUrl)
 	}
 
-	testUrl = "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans"
+	testUrl = ""
 	debt, err := GetPaymentPlans(testUrl)
 
 	if len(debt) != 4 {
@@ -59,7 +59,7 @@ func TestGetPayments(t *testing.T) {
 		t.Errorf("function failed to fail on empty response with url %q", testUrl)
 	}
 
-	testUrl = "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments"
+	testUrl = ""
 	debt, err := GetPayments(testUrl)
 
 	if len(debt) != 8 {
