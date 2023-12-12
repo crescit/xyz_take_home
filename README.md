@@ -1,16 +1,118 @@
-# TrueAccord_take_home
-Hello TrueAccord, Thank you for going through the process with me. Here's the private repository for the take home assignment. 
+# xyz_take_home
 
 To test the application with other urls replace the corresponding values in the .env
   
-  DEBT_URL = "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/debts"
-	PAYMENT_PLAN_URL = "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payment_plans"
-	PAYMENT_URL = "https://my-json-server.typicode.com/druska/trueaccord-mock-payments-api/payments"
+  DEBT_URL = ""
+	returns something like [
+  {
+    "amount": 123.46,
+    "id": 0
+  },
+  {
+    "amount": 100,
+    "id": 1
+  },
+  {
+    "amount": 4920.34,
+    "id": 2
+  },
+  {
+    "amount": 12938,
+    "id": 3
+  },
+  {
+    "amount": 9238.02,
+    "id": 4
+  }
+]
+
+
+	PAYMENT_PLAN_URL = ""
+returns something like 
+[
+  {
+    "amount_to_pay": 102.5,
+    "debt_id": 0,
+    "id": 0,
+    "installment_amount": 51.25,
+    "installment_frequency": "WEEKLY",
+    "start_date": "2020-09-28"
+  },
+  {
+    "amount_to_pay": 100,
+    "debt_id": 1,
+    "id": 1,
+    "installment_amount": 25,
+    "installment_frequency": "WEEKLY",
+    "start_date": "2020-08-01"
+  },
+  {
+    "amount_to_pay": 4920.34,
+    "debt_id": 2,
+    "id": 2,
+    "installment_amount": 1230.085,
+    "installment_frequency": "BI_WEEKLY",
+    "start_date": "2020-01-01"
+  },
+  {
+    "amount_to_pay": 4312.67,
+    "debt_id": 3,
+    "id": 3,
+    "installment_amount": 1230.085,
+    "installment_frequency": "WEEKLY",
+    "start_date": "2020-08-01"
+  }
+]
+	PAYMENT_URL = ""
+
+ returns something like 
+ [
+  {
+    "amount": 51.25,
+    "date": "2020-09-29",
+    "payment_plan_id": 0
+  },
+  {
+    "amount": 51.25,
+    "date": "2020-10-29",
+    "payment_plan_id": 0
+  },
+  {
+    "amount": 25,
+    "date": "2020-08-08",
+    "payment_plan_id": 1
+  },
+  {
+    "amount": 25,
+    "date": "2020-08-08",
+    "payment_plan_id": 1
+  },
+  {
+    "amount": 4312.67,
+    "date": "2020-08-08",
+    "payment_plan_id": 2
+  },
+  {
+    "amount": 1230.085,
+    "date": "2020-08-01",
+    "payment_plan_id": 3
+  },
+  {
+    "amount": 1230.085,
+    "date": "2020-08-08",
+    "payment_plan_id": 3
+  },
+  {
+    "amount": 1230.085,
+    "date": "2020-08-15",
+    "payment_plan_id": 3
+  }
+]
 
 Running the application:
   To run the application via docker:
-    docker build -t trueaccordtakehome .
-    docker run -d trueaccordtakehome  (this outputs <container id>)
+    docker build -t xyztakehome .
+    docker run -d xyztakehome  (this outputs <container id>)
     docker logs <container id>
 
   To run the application locally (further build support can be found via go's documentation):
